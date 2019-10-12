@@ -1,0 +1,4 @@
+shelfTabLayout -e -selectTab "Van" ShelfLayout;
+// python( "import VanTools" );
+
+ evalDeferred("python( \"import VanTools\" )");

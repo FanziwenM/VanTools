@@ -1,0 +1,7 @@
+{
+    "Version" : "1.1.1",
+    "PathFile" : "D:\\VanTools\\Path.json",
+    "InfoPage" : "https://ac.virtuosgames.com:8443/display/TEAM/VanTools",
+    "RemoteConfig" : "\\\\cnshasdfsv2\\Common\\Art\\EmployeesNew\\Fan Ziwen\\vanTools\\scripts\\VanTools\\config.json",
+    "MayaPref" : "D:\\VanTools\\MayaPref.json"
+}
