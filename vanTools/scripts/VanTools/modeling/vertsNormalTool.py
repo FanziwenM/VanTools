@@ -38,10 +38,10 @@ class VertsNormalUI():
                     # The two most commonly used Normal control buttons
                     with pm.rowLayout(nc = 2) as subRow:
                         lockBt = pm.iconTextButton(style="iconAndTextHorizontal",l="Lock Normal",image = "polyNormalLock.png",h=40,
-                         c="pm.polyNormalPerVertex(fn=True)")
+                         c=self.lockNormal)
 
                         unLockBt = pm.iconTextButton(style="iconAndTextHorizontal",l="Unlock Normal",image = "polyNormalUnlock.png",h=40,
-                         c="pm.polyNormalPerVertex(ufn=True)")
+                         c=self.unlockNormal)
                     with pm.frameLayout(l=" ", h=5) as tempFrame2:
                         pass
                     smUnLockBt = pm.iconTextButton(style="iconAndTextHorizontal",l="Smart Unlock Normal",image = "vanToolsIcons/unlockNormal.png",h=40,
@@ -345,3 +345,29 @@ class VertsNormalUI():
         fNstr = pm.polyInfo(face,fn=True)
         m = re.findall("([+\-]?[0-9]+.[0-9]+)", fNstr[0] )
         return map(float, m)
+    
+    def unlockNormal(self, *args):
+        selList = pm.ls(sl=True, fl=True)
+        if selList:
+            if isinstance(selList[0], pm.MeshVertex)or isinstance(selList[0], pm.MeshVertexFace):
+                for s in selList:
+                    pm.polyNormalPerVertex(ufn=True)
+            else:
+                vtxList = pm.polyListComponentConversion(selList, tv=True)
+                pm.polyNormalPerVertex(vtxList,ufn=True)
+
+        else:
+            pm.warning("Nothing selected!")
+    
+    def lockNormal(self, *args):
+        selList = pm.ls(sl=True, fl=True)
+        if selList:
+            if isinstance(selList[0], pm.MeshVertex)or isinstance(selList[0], pm.MeshVertexFace):
+                for s in selList:
+                    pm.polyNormalPerVertex(fn=True)
+            else:
+                vtxList = pm.polyListComponentConversion(selList, tv=True)
+                pm.polyNormalPerVertex(vtxList,fn=True)
+
+        else:
+            pm.warning("Nothing selected!")
