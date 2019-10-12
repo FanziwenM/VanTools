@@ -221,11 +221,10 @@ class VertsNormalUI():
             if isinstance(selList[0], pm.MeshVertex)or isinstance(selList[0], pm.MeshVertexFace):
                 for s in selList:
                     pm.polyNormalPerVertex(xyz=normal)
-            elif isinstance(selList[0], pm.MeshFace) or isinstance(selList[0], pm.MeshEdge):
-                vtxList = pm.polyListComponentConversion(selList, tv=True)
-                pm.polyNormalPerVertex(vtxList, xyz=normal)
             else:
-                pm.warning("Please select Vertices or Faces!")
+                vtxList = pm.polyListComponentConversion(selList, tv=True)
+                vtxList = pm.filterExpand(vtxList, sm=31)
+                pm.polyNormalPerVertex(vtxList, xyz=normal)
         else:
             pm.warning("Nothing selected!")
 
@@ -342,9 +341,14 @@ class VertsNormalUI():
         return type (float, float, float)
         '''
         import re
-        fNstr = pm.polyInfo(face,fn=True)
-        m = re.findall("([+\-]?[0-9]+.[0-9]+)", fNstr[0] )
-        return map(float, m)
+        fNstr = pm.polyInfo(face,fn=True)[0]
+        # print(fNstr)
+        a = re.findall("([+\-]?[0-9]+.[0-9]+)", fNstr.split(":")[1])
+        # a = fNstr.split(":")[1]
+        # a = a.split("\n")[0]
+        # a = a.split(" ")
+        # a.pop(0)
+        return map(float, a)
     
     def unlockNormal(self, *args):
         selList = pm.ls(sl=True, fl=True)
