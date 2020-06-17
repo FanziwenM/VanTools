@@ -1,7 +1,8 @@
-#Author: Fanziwen (120416678@qq.com)
-#Created: 08/11/2019
+# Author: Fanziwen (120416678@qq.com)
+# Created: 08/11/2019
 
 import pymel.core as pm
+
 
 def main():
     selectionList = pm.ls(sl=True)      # select faces
@@ -11,7 +12,7 @@ def main():
 
         duplicateMesh = pm.duplicate(originalTran, n=originalTran + "_dup")
 
-        facesIndex  = getFacesIndex2(selectionList)
+        facesIndex = getFacesIndex2(selectionList)
         duplicateFaces = []
         for i in facesIndex:
             duplicateFaces.append(duplicateMesh[0] + ".f" + i)
@@ -20,12 +21,14 @@ def main():
         newSelected = pm.ls(sl=True)
         invertSelection(newSelected)
         pm.delete()
+        pm.select(selectionList)
         pm.select(duplicateMesh)
         pm.xform(cp=True)
-    else:
-        pm.confirmDialog(title="error",message="No faces be selected")
-        return
+        pm.makeIdentity(duplicateMesh, apply=True, t=True)
 
+    else:
+        pm.confirmDialog(title="error", message="No faces be selected")
+        return
 
 
 def getFacesIndex2(faces):
@@ -34,10 +37,10 @@ def getFacesIndex2(faces):
         for f in faces:
             i = f.split(".f")[-1]
             index.append(i)
-        return index #return type:list
+        return index  # return type:list
     else:
-        print ("Please select faces!")
-        return
+        print("Please select faces!")
+        return 0
 
 
 def invertSelection(selectionList):

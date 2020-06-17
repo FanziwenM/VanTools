@@ -1,7 +1,6 @@
-#Author: Fanziwen (120416678@qq.com)
-#Created: 10/11/2019
-
-import pymel.core as pm 
+# Author: Fanziwen (120416678@qq.com)
+# Created: 10/11/2019
+import pymel.core as pm
 import re
 
 
@@ -9,25 +8,29 @@ class VanMesh():
     '''
     The properties of mesh my commonly used
     '''
-    def __init__(self,selectionList, *args, **kwargs):
+    def __init__(self, selectionList, *args, **kwargs):
         self.selList = pm.ls(selectionList, fl=True)
         self.obj = pm.ls(selectionList, o=True)[0]
         self.vxtSum = pm.polyEvaluate(self.obj, v=True)
 
         # Return a list of Vertices in Maya format, like: "polyCube.vtx[1]"
-        self.vtxList = ["{}.vtx[{}]".format(self.obj, i) for i in range(self.vxtSum)]
+        self.vtxList = [
+            "{}.vtx[{}]".format(self.obj, i) for i in range(self.vxtSum)
+            ]
 
-    def getVFList(self, vertex,*args):
+    def getVFList(self, vertex, *args):
         '''
         Get VertexFace through vertex
         '''
         oVtxIdx = vertex.split(".vtx")[1]
         vfInfo = pm.polyInfo(vertex, vf=True)
         vfIdx = re.findall("\s([0-9]+)\s", vfInfo[0])
-        vfList = ["{}.vtxFace{}[{}]".format(self.obj, oVtxIdx, vfI) for vfI in vfIdx]
+        vfList = [
+            "{}.vtxFace{}[{}]".format(self.obj, oVtxIdx, vfI) for vfI in vfIdx
+            ]
         return vfList
-    
-    def normalCompare(self,vertex1, vertex2, *args):
+
+    def normalCompare(self, vertex1, vertex2, *args):
         '''
         Compare two vectors whether is the same
         '''
@@ -39,7 +42,7 @@ class VanMesh():
         else:
             return False
 
-    def smartUnlockNormal(self,*args):
+    def smartUnlockNormal(self, *args):
         '''
         Unlock Normal with smooth/hard edges
         '''
@@ -49,11 +52,13 @@ class VanMesh():
             vfOld = vfList[-1]
             for vf in vfList:
                 if self.normalCompare(vf, vfOld):
-                    softEdges.append(pm.polyListComponentConversion(vf, te=True))
+                    softEdges.append(
+                        pm.polyListComponentConversion(vf, te=True)
+                        )
                 vfOld = vf
-        pm.polyNormalPerVertex(self.obj, ufn = True)
+        pm.polyNormalPerVertex(self.obj, ufn=True)
         pm.polySoftEdge(self.obj, a=0)
-        
+
         if softEdges:
             pm.select(softEdges)
             pm.polySoftEdge(a=180)

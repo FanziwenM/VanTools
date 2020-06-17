@@ -2,12 +2,11 @@
 # Created: 09/26/2019
 # Updated: 10/12/2019
 # Last change:
-#           - add flatten function
-#           - add Smart Unlock Normal
-#           - if selected face or edge can convert to vertices then get/set normal
-
+#    - add new function: set vertex normal to align to face
+#    - add flatten function
+#    - add Smart Unlock Normal
+#    - if selected face or edge can convert to vertices then get/set normal
 import pymel.core as pm
-import pymel.core.datatypes as dt
 
 
 class VertsNormalUI():
@@ -18,46 +17,74 @@ class VertsNormalUI():
         '''
         winWidth = 241
         # main window
-        with pm.window(title="VanNormalTools", sizeable=False, toolbox=True, w=winWidth) as self.win:
+        with pm.window(
+            title="VanNormalTools", sizeable=False,
+            toolbox=True, w=winWidth
+        ) as self.win:
             # Main Layout
             # with pm.formLayout() as mainForm:
             with pm.columnLayout() as mainColumn:
                 # General Layout, Most commonly used controls
-                with pm.frameLayout(l="General:") as generalFrame:
+                with pm.frameLayout(label="General:") as _:
                     pass
                 with pm.formLayout() as generalForm:
-                    with pm.frameLayout(l=" ", h=5) as tempFrame:
+                    with pm.frameLayout(label=" ", h=5) as tempFrame:
                         pass
                     # the dispaly normal button
-                    dispalyBtn = pm.iconTextButton(st='iconAndTextVertical', i1='vanToolsIcons/vertsNormal.png', l='Dispaly Toggle', h=50,
-                                                   c=self.toggle
-                                                   )
-                    # the normal size controls, including text and float field which use to set the normal size
+                    dispalyBtn = pm.iconTextButton(
+                        st='iconAndTextVertical',
+                        i1='vanToolsIcons/vertsNormal.png',
+                        label='Dispaly Toggle', h=50,
+                        c=self.toggle
+                    )
+                    # the normal size controls,
+                    # including text and float field
+                    # which use to set the normal size
                     with pm.columnLayout(ca=2, h=50, rs=5) as subColumn:
                         pm.text("Normal Szie:")
                         self.normalSizeFd = pm.floatField(
                             w=125, v=0.4, ec=self.setNormalSize)
                     # The two most commonly used Normal control buttons
                     with pm.rowLayout(nc=2) as subRow:
-                        lockBt = pm.iconTextButton(style="iconAndTextHorizontal", l="Lock Normal", image="polyNormalLock.png", h=40,
-                                                   c=self.lockNormal)
+                        _ = pm.iconTextButton(
+                            style="iconAndTextHorizontal",
+                            label="Lock Normal",
+                            image="polyNormalLock.png", h=40,
+                            c=self.lockNormal
+                            )
 
-                        unLockBt = pm.iconTextButton(style="iconAndTextHorizontal", l="Unlock Normal", image="polyNormalUnlock.png", h=40,
-                                                     c=self.unlockNormal)
-                    with pm.frameLayout(l=" ", h=5) as tempFrame2:
+                        _ = pm.iconTextButton(
+                            style="iconAndTextHorizontal",
+                            label="Unlock Normal",
+                            image="polyNormalUnlock.png", h=40,
+                            c=self.unlockNormal
+                            )
+                    with pm.frameLayout(label=" ", h=5) as tempFrame2:
                         pass
-                    smUnLockBt = pm.iconTextButton(style="iconAndTextHorizontal", l="Smart Unlock Normal", image="vanToolsIcons/unlockNormal.png", h=40,
-                                                   c=self.smartUnlockNormal)
+                    smUnLockBt = pm.iconTextButton(
+                        style="iconAndTextHorizontal",
+                        label="Smart Unlock Normal",
+                        image="vanToolsIcons/unlockNormal.png", h=40,
+                        c=self.smartUnlockNormal
+                        )
+                    setNormalAlign2FBt = pm.iconTextButton(
+                        style="iconAndTextHorizontal",
+                        label="Set Vertex Normal Align Face",
+                        image="vanToolsIcons/setNormalAlignFace.png", h=40,
+                        c=self.normalAlignFace
+                        )
+
                 # General Layout setting
                 pm.formLayout(
                     # bgc=(0.5,0.5,1),
-                    generalForm, e=True, w=winWidth-6, h=160,
+                    generalForm, e=True, w=winWidth-6, h=200,
                     af=[
-                        (dispalyBtn, "left", 5),             (subColumn, "right", 5),
-                        (tempFrame, "left", 1),               (tempFrame, "right", 1),
-                        (tempFrame2, "left", 1),               (tempFrame2, "right", 1),
-                        (subRow, "left", 5),                 (subRow, "right", 5),
+                        (dispalyBtn, "left", 5),    (subColumn, "right", 5),
+                        (tempFrame, "left", 1),     (tempFrame, "right", 1),
+                        (tempFrame2, "left", 1),    (tempFrame2, "right", 1),
+                        (subRow, "left", 5),        (subRow, "right", 5),
                         (smUnLockBt, "left", 30),
+                        (setNormalAlign2FBt, "left", 30),
                     ],
                     ac=[
                         (subColumn, "left", 5, dispalyBtn),
@@ -65,11 +92,12 @@ class VertsNormalUI():
                         (subRow, "top", 5, tempFrame),
                         (tempFrame2, "top", 1, subRow),
                         (smUnLockBt, "top", 5, tempFrame2),
+                        (setNormalAlign2FBt, "top", 2, smUnLockBt),
                     ])
-                #----------------------General Layout Setting End-------------------------#
+# ----------------------General Layout Setting End-------------------------#
 
                 # Quick Set Layout
-                with pm.frameLayout(label='Quick Set:') as frameQkSet:
+                with pm.frameLayout(label='Quick Set:') as _:
                     pass
                 with pm.formLayout() as quickSetForm:
                     with pm.rowLayout(nc=3) as row1:
@@ -87,54 +115,58 @@ class VertsNormalUI():
                         pm.button("-Z", w=77, h=30, bgc=(0.28, 0.66, 0.71),
                                   c=self.qkSetNegZ)
                     with pm.rowLayout(nc=3) as row3:
-                        pm.button("Flatten X", w=77, h=30,  # bgc = (0.28, 0.66, 0.71),
+                        pm.button("Flatten X", w=77, h=30,
                                   c=self.flattenX)
-                        pm.button("Flatten Y", w=77, h=30,  # bgc = (0.28, 0.66, 0.71),
+                        pm.button("Flatten Y", w=77, h=30,
                                   c=self.flattenY)
-                        pm.button("Flatten Z", w=77, h=30,  # bgc = (0.28, 0.66, 0.71),
+                        pm.button("Flatten Z", w=77, h=30,
                                   c=self.flattenZ)
                 # Quick Set Setting
                 pm.formLayout(
                     quickSetForm, e=True, w=winWidth-6,
                     af=[
-                        (row1, "left", 1),                         (row1, "right", 1),
-                        (row2, "left", 1),                         (row2, "right", 1),
-                        (row3, "left", 1),                         (row3, "right", 1),
+                        (row1, "left", 1),        (row1, "right", 1),
+                        (row2, "left", 1),        (row2, "right", 1),
+                        (row3, "left", 1),        (row3, "right", 1),
                         (row3, "bottom", 1),
                     ],
                     ac=[
                         (row2, "top", 1, row1),
                         (row3, "top", 1, row2),
                     ])
-                #--------------------------- Quick Set Setting end ------------------------------#
+# --------------------------- Quick Set Setting end ------------------------ #
 
                 # Manual Set Layout
-                with pm.frameLayout(l="Manual Set: ") as manualFrame:
+                with pm.frameLayout(label="Manual Set: ") as _:
                     pass
                 with pm.columnLayout(adj=True) as manualColumn:
                     self.manualGetBtn = pm.button(
-                        l="Get Normal", c=self.getVertsNormal)
+                        label="Get Normal", c=self.getVertsNormal)
                     self.normalField = pm.floatFieldGrp(
                         nf=3, cw3=(73, 73, 73), precision=2)
-                    self.manualSetBtn = pm.button(l="Set Normal", h=40, bgc=(
-                        0.28, 0.66, 0.71), c=self.setVertsNormal)
+                    self.manualSetBtn = pm.button(
+                        label="Set Normal", h=40,
+                        bgc=(0.28, 0.66, 0.71),
+                        c=self.setVertsNormal
+                    )
                 # Layout setting
                 pm.columnLayout(
                     manualColumn, e=True, w=winWidth-6,  # bgc=(0,0.5,0),
                     rs=5, co=("both", 5),
                 )
-                #---------------------------Manual Set Layout End---------------------------------#
+# ---------------------------Manual Set Layout End----------------------------#
 
                 # Transform Normal Layout
-                with pm.frameLayout(l="Transfer Normal:") as transFrame:
+                with pm.frameLayout(label="Transfer Normal:") as _:
                     pass
                 with pm.formLayout() as transLayout:
                     self.getObjBtn = pm.button(
-                        l="GetMesh", h=30, c=self.getMesh)
+                        label="GetMesh", h=30, c=self.getMesh)
                     self.meshName = pm.textField(
                         placeholderText="Null", editable=False, h=25)
                     self.transNormalBtn = pm.button(
-                        "Transfer Normal", h=40, bgc=(0.28, 0.66, 0.71), c=self.setNormal)
+                        "Transfer Normal", h=40, bgc=(0.28, 0.66, 0.71),
+                        c=self.setNormal)
                 # Layout Setting
                 pm.formLayout(
                     transLayout, e=True,  # bgc=(0.5,0.5,0),
@@ -157,23 +189,8 @@ class VertsNormalUI():
                 mainColumn, e=True,
                 adj=True, rs=3,
             )
-            # pm.formLayout(
-            #     mainForm,edit=True,
-            #     af = [
-            #         (generalForm, "top", 1),
-            #         (generalForm,"left",1),                                     (generalForm,"right",1),
-            #         (quickSetForm,"left",1),                                 (quickSetForm,"right",1),
-            #         (manualColumn, "left",1),                               (manualColumn,"right", 1),
-            #         (transFrame,"left", 1),                                 (transFrame, "right", 1),
-            #         (transLayout, "left",1),                                (transLayout, "right", 1 ),
-            #     ],
-            #     ac = [
-            #         (quickSetForm, "top", 5, generalForm),
-            #         (manualColumn, "top", 5, quickSetForm),
-            #         (transLayout,"top", 5, manualColumn),
-            #     ],w=winWidth
-            # )
-            # --------------------- Main Layout end -----------------------------------#
+
+# --------------------- Main Layout end -----------------------------------#
         pm.showWindow(self.win)
 
     def toggle(self, *args):
@@ -189,7 +206,7 @@ class VertsNormalUI():
 
     def setNormalSize(self, *args):
         '''
-        set the normal size 
+        set the normal size
         '''
         newSize = pm.floatField(self.normalSizeFd, q=True, v=True)
         print(newSize)
@@ -197,7 +214,8 @@ class VertsNormalUI():
 
     def getVertsNormal(self, *args):
         '''
-        get vertexes Normal, the value will be saved in floatFieldGrp(self.normalField)
+        get vertexes Normal,
+        the value will be saved in floatFieldGrp(self.normalField)
         update:
             - 10/12/2019: add Get face normal
         '''
@@ -223,9 +241,11 @@ class VertsNormalUI():
 
     def setVertsNormal(self, *args):
         '''
-        if the 'floatFieldGrp(self.normalField)' has normal value, pick the value set to selected vertexes normal
+        if the 'floatFieldGrp(self.normalField)' has normal value,
+        pick the value set to selected vertexes normal
         update:
-            - 10/12/2019: if selected type is MeshFace also can set Normal(Face convert to Vertices)
+            #10/12/2019:
+            if selected type is MeshFace also can set Normal(Face convert to Vertices)
         '''
         selList = pm.ls(sl=True)
         if selList:
@@ -242,7 +262,8 @@ class VertsNormalUI():
 
     def getMesh(self, *args):
         '''
-        get the Name from the selected Object, and save the name in the 'pm.textField(self.meshName)'
+        get the Name from the selected Object,
+        and save the name in the 'pm.textField(self.meshName)'
         '''
         selList = pm.ls(sl=True)
         if selList:
@@ -252,7 +273,8 @@ class VertsNormalUI():
 
     def setNormal(self, *args):
         '''
-        if the ' pm.textField(self.meshName) ' is define, setting selected mesh normal from the defined name
+        if the ' pm.textField(self.meshName) ' is define,
+        setting selected mesh normal from the defined name
         '''
         sourceName = self.meshName.getText()
 
@@ -261,10 +283,14 @@ class VertsNormalUI():
             selList = pm.ls(sl=True)
             for s in selList:
                 '''
-                    transferAttributes()
-                        - sampleSpace : spa              (int)           [create,edit]
-                            Selects which space the attribute transfer is performed in. 0 is world space, 1 is model space, 4 is component-based, 5
-                            is topology-based. The default is world space.
+        transferAttributes()
+            - sampleSpace : spa              (int)           [create,edit]
+                Selects which space the attribute transfer is performed in.
+                0 is world space,
+                1 is model space,
+                4 is component-based,
+                5 is topology-based.
+                The default is world space.
                 '''
                 pm.transferAttributes(sourceName, s, transferNormals=1)
                 pm.delete(s, ch=True)
@@ -320,7 +346,7 @@ class VertsNormalUI():
         if selList:
             try:
                 pm.polyNormalPerVertex(xyz=axisDic[axis])
-            except:
+            except Exception:
                 vtxList = pm.polyListComponentConversion(selList, tv=True)
                 pm.polyNormalPerVertex(vtxList, xyz=axisDic[axis])
         else:
@@ -362,7 +388,7 @@ class VertsNormalUI():
         import re
         fNstr = pm.polyInfo(face, fn=True)[0]
         # print(fNstr)
-        a = re.findall("([+\-]?[0-9]+.[0-9]+)", fNstr.split(":")[1])
+        a = re.findall("([+|-]?[0-9]+.[0-9]+)", fNstr.split(":")[1])
         # a = fNstr.split(":")[1]
         # a = a.split("\n")[0]
         # a = a.split(" ")
@@ -394,3 +420,31 @@ class VertsNormalUI():
 
         else:
             pm.warning("Nothing selected!")
+
+    def normalAlignFace(self, *args):
+        import collections
+        selList = pm.ls(sl=True, fl=True)
+        vtxDict = collections.defaultdict(list)
+        if isinstance(selList[0], pm.MeshFace):
+            for f in selList:
+                fArea = f.getArea()
+                fNormal = f.getNormal()
+                vtx = pm.polyListComponentConversion(f, tv=True)
+                vtx = pm.filterExpand(vtx, sm=31)
+                for v in vtx:
+                    vtxDict[v].append([fNormal, fArea])
+
+            print(vtxDict)
+            for k, v in vtxDict.items():
+                if len(v) <= 1:
+                    pm.polyNormalPerVertex(k, xyz=v[0][0])
+                else:
+                    a = 0
+                    b = 0
+                    for i in v:
+                        a += i[0]*i[1]
+                        b += i[1]
+                    normal = a/b
+                    pm.polyNormalPerVertex(k, xyz=normal)
+        else:
+            pm.warning("Please Select Face")
