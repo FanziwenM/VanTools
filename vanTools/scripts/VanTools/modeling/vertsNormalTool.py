@@ -2,6 +2,7 @@
 # Created: 09/26/2019
 # Updated: 10/12/2019
 # Last change:
+#    #06/17/2020:
 #    - add new function: set vertex normal to align to face
 #    - add flatten function
 #    - add Smart Unlock Normal
@@ -18,6 +19,7 @@ class VertsNormalUI():
         winWidth = 241
         # main window
         with pm.window(
+            "VanNormalTools1231",
             title="VanNormalTools", sizeable=False,
             toolbox=True, w=winWidth
         ) as self.win:
@@ -69,7 +71,7 @@ class VertsNormalUI():
                         )
                     setNormalAlign2FBt = pm.iconTextButton(
                         style="iconAndTextHorizontal",
-                        label="Set Vertex Normal Align Face",
+                        label="Vertex Normal Align Face",
                         image="vanToolsIcons/setNormalAlignFace.png", h=40,
                         c=self.normalAlignFace
                         )
@@ -422,29 +424,6 @@ class VertsNormalUI():
             pm.warning("Nothing selected!")
 
     def normalAlignFace(self, *args):
-        import collections
-        selList = pm.ls(sl=True, fl=True)
-        vtxDict = collections.defaultdict(list)
-        if isinstance(selList[0], pm.MeshFace):
-            for f in selList:
-                fArea = f.getArea()
-                fNormal = f.getNormal()
-                vtx = pm.polyListComponentConversion(f, tv=True)
-                vtx = pm.filterExpand(vtx, sm=31)
-                for v in vtx:
-                    vtxDict[v].append([fNormal, fArea])
-
-            print(vtxDict)
-            for k, v in vtxDict.items():
-                if len(v) <= 1:
-                    pm.polyNormalPerVertex(k, xyz=v[0][0])
-                else:
-                    a = 0
-                    b = 0
-                    for i in v:
-                        a += i[0]*i[1]
-                        b += i[1]
-                    normal = a/b
-                    pm.polyNormalPerVertex(k, xyz=normal)
-        else:
-            pm.warning("Please Select Face")
+        from VanTools.modeling import setNormalAlignFace
+        reload(setNormalAlignFace)
+        setNormalAlignFace.main()

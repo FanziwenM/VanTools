@@ -237,7 +237,7 @@ global proc shelf_Van () {
         -style "iconOnly" 
         -marginWidth 1
         -marginHeight 1
-        -command "from VanTools.modeling import duplicateFaces\n\nduplicateFaces.main()" 
+        -command "from VanTools.modeling import duplicateFaces\nreload(duplicateFaces)\nduplicateFaces.main()\n\n\t\t" 
         -sourceType "python" 
         -commandRepeatable 1
         -flat 1
@@ -553,7 +553,7 @@ global proc shelf_Van () {
         -style "iconOnly" 
         -marginWidth 1
         -marginHeight 1
-        -command "import pymel.core as pm\nfrom VanTools.modeling.vertsNormalTool import VertsNormalUI\nreload(VanTools.modeling.vertsNormalTool)\ntry:\n    pm.deleteUI(UI.win)\nexcept:\n    pass\n    \nUI = VertsNormalUI()" 
+        -command "import pymel.core as pm\nfrom VanTools.modeling.vertsNormalTool import VertsNormalUI\nreload(VanTools.modeling.vertsNormalTool)\ntry:\n    pm.deleteUI(\"VanNormalTools1231\")\nexcept:\n    pass\n    \nUI = VertsNormalUI()" 
         -sourceType "python" 
         -commandRepeatable 1
         -flat 1
