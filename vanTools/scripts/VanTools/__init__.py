@@ -116,14 +116,6 @@ def checkIcons(shelfVan, version, newVersion):
     # Disable Quick export
     mel.eval('shelfButton  -e -enable false {}'.format(shelfVan[2]))
 
-    # Disable Houdini Asset
-    if not pm.pluginInfo("houdiniEngine", q=True, loaded=True):
-        mel.eval('shelfButton  -e -enable false {}'.format(shelfVan[24]))
-    else:
-        mel.eval('shelfButton  -e -enable true {}'.format(shelfVan[24]))
-
-    # -------------------------------------------
-
     print("Check Icons Done")
 
 
